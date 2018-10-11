@@ -4,8 +4,11 @@ use std::error::Error;
 use std::fmt;
 
 lazy_static! {
-    static ref LEXICAL_SPECS: Vec<(TokenType, Regex)> =
-        vec![(TYPE_BOOLEAN, Regex::new(r"^(true|false)").unwrap())];
+    static ref LEXICAL_SPECS: Vec<(TokenType, Regex)> = vec![
+        (TYPE_COMMENT, Regex::new(r"^(#.*)\n").unwrap()),
+        (TYPE_STRING, Regex::new(r#"^("(([^"]|\\")+?[^\\]|([^"]|\\")|)")"#).unwrap()), // Single line only
+        (TYPE_BOOLEAN, Regex::new(r"^(true|false)").unwrap()),
+    ];
 }
 
 #[derive(Debug)]
