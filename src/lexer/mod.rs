@@ -30,7 +30,7 @@ lazy_static! {
         (TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET, Regex::new(r"^(\]\])").unwrap()),
 
         (TYPE_OP_DOT, Regex::new(r"^(\.)").unwrap()),
-        
+
         (TYPE_NEWLINE, Regex::new(r"^(\n|\r\n)").unwrap()),
     ];
 }
@@ -114,6 +114,76 @@ pub fn tokenize(source: &str, is_top_level: bool) -> Result<Vec<Token>, LexerErr
 #[cfg(test)]
 mod tests {
 
+    use super::*;
+    use crate::tokens::*;
+    use std::collections::BTreeMap;
+
     #[test]
-    fn valid_tokenizing() {}
+    fn valid_tokenizing() {
+        let mut valid_tokens = BTreeMap::new();
+        valid_tokens.insert(TokenTypeName::Comment, vec![
+            ("# My very insightful comment about the state of the universe\n# And now for something completely different!",
+            "# My very insightful comment about the state of the universe")
+        ]);
+
+        valid_tokens.insert(
+            TokenTypeName::String,
+            vec![
+                (
+                    r#""a valid hug3 text" "some other string" = 42"#,
+                    r#""a valid hug3 text""#,
+                ),
+                (
+                    r#""I\'m a string. \"You can quote me\". Name\tJos\u00E9\nLocation\tSF." "some other string" = 42"#,
+                    r#""I\'m a string. \"You can quote me\". Name\tJos\u00E9\nLocation\tSF.""#
+                ),
+            ],
+        );
+
+        for (token_type_name, string_pairs) in valid_tokens {
+            for (source, expected_match) in string_pairs {
+                let token = munch_a_token(source);
+
+                assert!(
+                    token.is_some(),
+                    "Failed to tokenize: {:?}\nExpected: {}\nOut of: {}\nGot nothing!",
+                    token_type_name,
+                    expected_match,
+                    source
+                );
+
+                let token = token.unwrap();
+
+                assert_eq!(token.token_type.name, token_type_name);
+            }
+        }
+    }
+
+    #[test]
+    fn invalid_tokenizing() {}
+
+    #[test]
+    fn token_type_order() {
+        let type_a = TokenType {
+            name: TokenTypeName::Assignment,
+            priority: 5,
+            is_metadata: false,
+        };
+
+        let type_b = TokenType {
+            name: TokenTypeName::Assignment,
+            priority: 0,
+            is_metadata: false,
+        };
+        let type_c = TokenType {
+            name: TokenTypeName::Assignment,
+            priority: 3,
+            is_metadata: false,
+        };
+
+        assert!(type_b < type_c);
+        assert!(type_c < type_a);
+        assert!(type_c > type_b);
+        assert!(type_a > type_c);
+    }
 }

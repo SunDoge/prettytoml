@@ -1,6 +1,6 @@
 use std::cmp::Ordering;
 
-#[derive(Debug)]
+#[derive(Debug, Ord, PartialEq, PartialOrd, Eq)]
 pub enum TokenTypeName {
     Boolean,
     Integer,
@@ -152,8 +152,8 @@ pub const TYPE_COMMENT: TokenType = TokenType {
 #[derive(Debug)]
 pub struct TokenType {
     pub priority: u8,
-    name: TokenTypeName,
-    is_metadata: bool,
+    pub name: TokenTypeName,
+    pub is_metadata: bool,
 }
 
 // impl TokenType {
@@ -178,7 +178,7 @@ impl PartialEq for TokenType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Token {
     pub source_substring: String,
     pub token_type: &'static TokenType,
