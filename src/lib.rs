@@ -9,7 +9,7 @@ use std::path::Path;
 
 pub fn prettify(toml_text: &str) -> String {
     let tokens = lexer::tokenize(toml_text, true);
-    println!("tokens: {:?}", tokens.unwrap());
+    println!("tokens: {:#?}", tokens.unwrap_or(vec![]));
     "".to_string()
 }
 

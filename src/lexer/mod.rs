@@ -1,13 +1,36 @@
 use super::tokens::*;
-use regex::Regex;
+use regex::{Regex, RegexBuilder};
 use std::error::Error;
 use std::fmt;
 
 lazy_static! {
     static ref LEXICAL_SPECS: Vec<(TokenType, Regex)> = vec![
         (TYPE_COMMENT, Regex::new(r"^(#.*)\n").unwrap()),
-        (TYPE_STRING, Regex::new(r#"^("(([^"]|\\")+?[^\\]|([^"]|\\")|)")"#).unwrap()), // Single line only
+        (TYPE_STRING, Regex::new(r#"^("(([^"]|\\")+?[^\\]|([^"]|\\"))")"#).unwrap()), // Single line only, no |
+        (TYPE_MULTILINE_STRING, RegexBuilder::new(r#"^(""".*?""")"#).dot_matches_new_line(true).build().unwrap()),
+        (TYPE_LITERAL_STRING, Regex::new(r"^('.*?')").unwrap()),
+        (TYPE_MULTILINE_LITERAL_STRING, RegexBuilder::new(r"^('''.*?''')").dot_matches_new_line(true).build().unwrap()),
+        (TYPE_BARE_STRING, Regex::new(r"^([A-Za-z0-9_-]+)").unwrap()),
+        (TYPE_DATE, Regex::new(r"^([0-9]{4}-[0-9]{2}-[0-9]{2}(T[0-9]{2}:[0-9]{2}:[0-9]{2}(\.[0-9]*)?)?(([zZ])|((\+|-)[0-9]{2}:[0-9]{2}))?)").unwrap()),
+        (TYPE_WHITESPACE, RegexBuilder::new(r"^( |\t)").dot_matches_new_line(true).build().unwrap()),
+        (TYPE_INTEGER, Regex::new(r"^(((\+|-)[0-9_]+)|([0-9][0-9_]*))").unwrap()),
+        (TYPE_FLOAT, Regex::new(r"^((((\+|-)[0-9_]+)|([1-9][0-9_]*))(\.[0-9_]+)?([eE](\+|-)?[0-9_]+)?)").unwrap()),
         (TYPE_BOOLEAN, Regex::new(r"^(true|false)").unwrap()),
+
+        (TYPE_OP_SQUARE_LEFT_BRACKET, Regex::new(r"^(\[)").unwrap()),
+        (TYPE_OP_SQUARE_RIGHT_BRACKET, Regex::new(r"^(\])").unwrap()),
+
+        (TYPE_OP_CURLY_LEFT_BRACKET, Regex::new(r"^(\{)").unwrap()),
+        (TYPE_OP_CURLY_RIGHT_BRACKET, Regex::new(r"^(\})").unwrap()),
+
+        (TYPE_OP_ASSIGNMENT, Regex::new(r"^(=)").unwrap()),
+        (TYPE_OP_COMMA, Regex::new(r"^(,)").unwrap()),
+
+        (TYPE_OP_DOUBLE_SQUARE_LEFT_BRACKET, Regex::new(r"^(\[\[)").unwrap()),
+        (TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET, Regex::new(r"^(\]\])").unwrap()),
+
+        (TYPE_OP_DOT, Regex::new(r"^(\.)").unwrap()),
+        (TYPE_NEWLINE, Regex::new(r"^(\n|\r\n)").unwrap()),
     ];
 }
 
