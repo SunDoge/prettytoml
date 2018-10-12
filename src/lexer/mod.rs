@@ -30,6 +30,7 @@ lazy_static! {
         (TYPE_OP_DOUBLE_SQUARE_RIGHT_BRACKET, Regex::new(r"^(\]\])").unwrap()),
 
         (TYPE_OP_DOT, Regex::new(r"^(\.)").unwrap()),
+        
         (TYPE_NEWLINE, Regex::new(r"^(\n|\r\n)").unwrap()),
     ];
 }

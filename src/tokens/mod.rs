@@ -178,7 +178,7 @@ impl PartialEq for TokenType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub source_substring: String,
     pub token_type: &'static TokenType,

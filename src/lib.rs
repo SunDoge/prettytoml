@@ -2,14 +2,21 @@
 extern crate lazy_static;
 extern crate regex;
 
-pub mod lexer;
-pub mod tokens;
+mod elements;
+mod lexer;
+mod parser;
+mod tokens;
 
+use self::lexer::tokenize;
+use self::parser::parse_tokens;
 use std::path::Path;
 
 pub fn prettify(toml_text: &str) -> String {
-    let tokens = lexer::tokenize(toml_text, true);
-    println!("tokens: {:#?}", tokens.unwrap_or(vec![]));
+    let tokens = tokenize(toml_text, true).expect("Fail to tokenize.");
+
+    println!("tokens: {:#?}", tokens);
+
+    let _elements = parse_tokens(tokens);
     "".to_string()
 }
 
